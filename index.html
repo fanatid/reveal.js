@@ -1,40 +1,251 @@
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-		<link rel="stylesheet" href="dist/reset.css">
-		<link rel="stylesheet" href="dist/reveal.css">
-		<link rel="stylesheet" href="dist/theme/black.css">
+  <title>Geyser gRPC v2 | richat</title>
 
-		<!-- Theme used for syntax highlighted code -->
-		<link rel="stylesheet" href="plugin/highlight/monokai.css">
-	</head>
-	<body>
-		<div class="reveal">
-			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
-			</div>
-		</div>
+  <link rel="stylesheet" href="dist/reset.css" />
+  <link rel="stylesheet" href="dist/reveal.css" />
+  <link rel="stylesheet" href="dist/theme/moon.css" />
 
-		<script src="dist/reveal.js"></script>
-		<script src="plugin/notes/notes.js"></script>
-		<script src="plugin/markdown/markdown.js"></script>
-		<script src="plugin/highlight/highlight.js"></script>
-		<script>
-			// More info about initialization & config:
-			// - https://revealjs.com/initialization/
-			// - https://revealjs.com/config/
-			Reveal.initialize({
-				hash: true,
+  <!-- Theme used for syntax highlighted code -->
+  <link rel="stylesheet" href="plugin/highlight/monokai.css" />
+</head>
 
-				// Learn about plugins: https://revealjs.com/plugins/
-				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
-			});
-		</script>
-	</body>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section>
+        <h2>Solana Geyser Plugins</h2>
+
+        <p>Interface to stream data from the validator or RPC</p>
+
+        <p style="padding-top: 80pt;">
+          <a href="https://docs.anza.xyz/validator/geyser/">https://docs.anza.xyz/validator/geyser/</a>
+        </p>
+      </section>
+
+      <section>
+        <section>
+          <h2 style="text-transform: unset;">What can be streamed?</h2>
+        </section>
+        <section>
+          <h2>Snapshot data</h2>
+          <ol>
+            <li class="fragment">accounts</li>
+            <li class="fragment">end of startup notification</li>
+          </ol>
+        </section>
+        <section>
+          <h2>Processed data</h2>
+          <ol>
+            <li class="fragment">accounts</li>
+            <li class="fragment">slot status</li>
+            <li class="fragment">transactions</li>
+            <li class="fragment">entries</li>
+            <li class="fragment">block metadata</li>
+          </ol>
+        </section>
+      </section>
+
+      <section>
+        <h2>Existed plugins</h2>
+        <ol>
+          <li class="fragment">
+            <a href="https://github.com/solana-labs/solana-accountsdb-plugin-postgres">PostgreSQL by Solana Team</a>
+          </li>
+          <li class="fragment">
+            <a href="https://github.com/holaplex/indexer-geyser-plugin">RabbitMQ by Holaplex</a>
+          </li>
+          <li class="fragment">
+            <a href="https://github.com/Blockdaemon/solana-accountsdb-plugin-kafka">Kafka by Blockdaemon</a>
+          </li>
+          <li class="fragment">
+            <a href="https://github.com/lijunwangs/solana-accountsdb-plugin-bigtable">BigTable by Lijun Wang</a>
+          </li>
+          <li class="fragment">
+            <a href="https://github.com/rpcpool/solana-accountsdb-sqs">SQS by Triton One</a>
+          </li>
+          <li class="fragment">
+            <a href="https://github.com/rpcpool/yellowstone-grpc">Yellowstone gRPC by Triton One</a>
+          </li>
+          <li class="fragment">and much more...</li>
+        </ol>
+      </section>
+
+      <section>
+        <section>
+          <h2>Current problems</h2>
+        </section>
+        <section>
+          <h2>Current problems</h2>
+          <ol>
+            <li>
+              We need to make a build for every Agave version
+              <ol>
+                <li class="fragment">Minor version change Rust version</li>
+                <li class="fragment">Minor version introduce interface changes</li>
+                <li class="fragment">Patch versions can contains backported breaking-changes (TransactionError case)
+                </li>
+              </ol>
+            </li>
+          </ol>
+        </section>
+        <section>
+          <h2>Current problems</h2>
+          <ol>
+            <li>We need to make a build for every Agave version</li>
+            <li>
+              Hard to test and debug
+              <ol>
+                <li class="fragment">Testing and debugging only possible on the server with Agave node</li>
+                <li class="fragment">If plugin panic we need to restart the node</li>
+              </ol>
+            </li>
+          </ol>
+        </section>
+        <section>
+          <h2>Current problems</h2>
+          <ol>
+            <li>We need to make a build for every Agave version</li>
+            <li>Hard to test and debug</li>
+            <li>
+              We need to spin-up Agave node
+              <ol>
+                <li class="fragment">Geyser makes Agave node slower, significantly on startup (extra ~20min to process
+                  snapshot)</li>
+                <li class="fragment">Server price / availability, $500/month if we run ourselves?</li>
+                <li class="fragment">Time for monitoring or pay to RPC provider</li>
+              </ol>
+            </li>
+          </ol>
+        </section>
+        <section>
+          <h2>Current problems</h2>
+          <ol>
+            <li>We need to make a build for every Agave version</li>
+            <li>Hard to test and debug</li>
+            <li>We need to spin-up Agave node</li>
+            <li>
+              Hard to monitor resource consumption
+              <ol>
+                <li class="fragment">Bandwidth can be limited (1GBit/s)</li>
+                <li class="fragment">CPU can be monitored by thread names</li>
+                <li class="fragment">Impossible to measure memory consumption</li>
+              </ol>
+            </li>
+          </ol>
+        </section>
+      </section>
+
+      <section>
+        <h2 style="text-transform: unset;">Solutions?</h2>
+        <p class="fragment" style="padding-top: 40pt;">Stream all data received from Geyser</p>
+        <p><span class="fragment">and we have... </span><span class="fragment">Yellowstone gRPC plugin by Triton
+            One</span></p>
+        <p class="fragment">widely used plugin with rich set of filters</p>
+      </section>
+
+      <section>
+        <h2 style="text-transform: unset;">Benefints of Yellowstone gRPC plugin</h2>
+        <ol>
+          <li class="fragment">Easy to use, a lot of examples</li>
+          <li class="fragment">
+            A lot of applications based on Yellowstone gRPC interface, like
+            <ol>
+              <li>Jupiter</li>
+              <li>Whirligig (Triton One)</li>
+            </ol>
+          </li>
+        </ol>
+      </section>
+
+      <section>
+        <h2 style="text-transform: unset;">Problems with Yellowstone gRPC plugin</h2>
+        <ol>
+          <li class="fragment">Makes Agave node slower (startup time!)</li>
+          <li class="fragment">Impossible to measure and control memory consumption</li>
+          <li class="fragment">Inter continental streams (100ms latency) are impossible on high bandwidth</li>
+          <li class="fragment">Random disconnect error codes</li>
+          <li class="fragment">gRPC doesn't work in browser</li>
+          <li class="fragment">Hard to handle lot of users (resources on Agave node are limited!)</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2 style="text-transform: unset;">Can we do better?</h2>
+        <p>Yes, we can stream all data to another server in the same DC and off-load work from the server with Agave
+          node.
+        </p>
+      </section>
+
+      <section>
+        <h3 style="text-transform: unset;">..but not everything is great with Yellowstone gRPC</h3>
+        <ol>
+          <li class="fragment">With a lot of filters and features plugin is overloaded</li>
+          <li class="fragment">Inter continental streams are not available</li>
+          <li class="fragment">Even streams on the same continent can be problematic (latency is super important!)</li>
+          <li class="fragment">We still need message router (consume stream from Agave and handle clients filters)</li>
+        </ol>
+      </section>
+
+      <section>
+        <section>
+          <h3 style="text-transform: unset;">new generation of tools based on Yellowstone gRPC</h3>
+          <h2 style="text-transform: unset;">richat</h2>
+          <ol>
+            <li class="fragment">Plugin</li>
+            <li class="fragment">Router</li>
+            <li class="fragment">Apps</li>
+          </ol>
+        </section>
+        <section>
+          <h2 style="text-transform: unset;">richat-plugin</h2>
+          <ol>
+            <li class="fragment">Stream only Geyser messages with Yellowstone gRPC format</li>
+            <li class="fragment">Protobuf encoding with 1 allocation</li>
+            <li class="fragment">No filters</li>
+            <li class="fragment">Effective memory management</li>
+            <li class="fragment">QUIC based (inter continental stream is possible!)</li>
+          </ol>
+        </section>
+        <section>
+          <h2 style="text-transform: unset;">richat-router</h2>
+          <ol>
+            <li class="fragment">Re-send incoming Geyser messages to next router / apps</li>
+          </ol>
+        </section>
+        <section>
+          <h2 style="text-transform: unset;">richat apps</h2>
+          <ol>
+            <li class="fragment">richat-grpc</li>
+            <li class="fragment">richat-pubsub</li>
+            <li class="fragment">richat-web-transport</li>
+            <li class="fragment">richat-jupiter</li>
+          </ol>
+        </section>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="dist/reveal.js"></script>
+  <script src="plugin/notes/notes.js"></script>
+  <script src="plugin/markdown/markdown.js"></script>
+  <script src="plugin/highlight/highlight.js"></script>
+  <script>
+    // More info about initialization & config:
+    // - https://revealjs.com/initialization/
+    // - https://revealjs.com/config/
+    Reveal.initialize({
+      hash: true,
+      // Learn about plugins: https://revealjs.com/plugins/
+      plugins: [RevealMarkdown, RevealHighlight, RevealNotes],
+    });
+  </script>
+</body>
+
 </html>
