@@ -30,7 +30,7 @@
   <div class="reveal">
     <div class="slides">
       <section>
-        <h2>Agave RPC stack drop-in replacement (partial?)</h2>
+        <h2>Partial Agave RPC stack drop-in replacement</h2>
       </section>
 
       <section>
@@ -38,7 +38,7 @@
 
         <p style="padding-top: 80pt;">Interface with real-time data:</p>
         <ul>
-          <li>accounts</li>
+          <li>accounts (removed in the future? <a href="https://github.com/anza-xyz/agave/pull/5114">agave#5114</a>)</li>
           <li>transactions</li>
           <li>entries</li>
           <li>block meta</li>
@@ -65,9 +65,9 @@
             <a href="https://github.com/rpcpool/solana-accountsdb-sqs">SQS by Triton One</a>
           </li>
           <li>
-            <a href="https://github.com/rpcpool/yellowstone-grpc">Yellowstone gRPC by Triton One</a>
+            <a href="https://github.com/rpcpool/yellowstone-grpc">Yellowstone gRPC / Dragon's Mouth by Triton One</a>
           </li>
-          <li>and much more...</li>
+          <li>and many more...</li>
         </ul>
       </section>
 
@@ -121,22 +121,22 @@
             <li>Server with filters (fully compatiable with Yellowstone gRPC / Dragon's Mouth)</li>
             <li>Almost fully compatible implementation of Solana Pubsub (except for voteSubscribe, but with transactionSubscribe)</li>
             <li>Crates that allow building consumers with filters</li>
-            <li>5-10ms delay compare to Dragon's Mouth for full stream</li>
+            <li>5-10ms delay for full stream in 70% cases compare to Dragon's Mouth</li>
             <li>Possible additions: performant implementation for Jupiter?</li>
           </ul>
 
           <br/>
           <br/>
-          <a href="https://github.com/lamports-dev/richat" >https://github.com/lamports-dev/richat</a>
+          <a href="https://github.com/lamports-dev/richat">https://github.com/lamports-dev/richat</a>
         </section>
       </section>
 
       <section>
         <section>
-          <h3>alpamayo [wip]</h3>
+          <h3>alpamayo</h3>
 
           <ul>
-            <li>subscribe to the Geyser gRPC stream and use RPC in certain cases for dead slots</li>
+            <li>subscribe to the Geyser gRPC stream and use RPC in certain cases for missed slots</li>
             <li>store blocks in protobuf in files</li>
             <li>io-uring (with plans to use direct-io)</li>
             <li>~30% faster response time compared to Agave without load</li>
@@ -146,18 +146,20 @@
 
           <br/>
           <br/>
-          <a href="https://github.com/lamports-dev/alpamayo" >https://github.com/lamports-dev/alpamayo</a>
+          <a href="https://github.com/lamports-dev/alpamayo">https://github.com/lamports-dev/alpamayo</a>
         </section>
         <section>
-          <h3>alpamayo [wip]</h3>
+          <h3>alpamayo</h3>
 
-          <ul>
+          <ul style="font-size: 14pt;">
             <li>getBlock</li>
             <li>getBlockHeight</li>
             <li>getBlocks</li>
+            <li>getBlocksWithLimit</li>
             <li>getBlockTime</li>
             <li>getLatestBlockhash</li>
-            <li>getRecentPrioritizationFees (<a href="https://github.com/lamports-dev/solfees" >lamports-dev/solfees</a>)</li>
+            <li>getRecentPrioritizationFees (includes `percentile` argument <a href="https://github.com/anza-xyz/agave/pull/217">agave#217</a>)</li>
+            <li>getSignaturesForAddress</li>
             <li>getSignatureStatuses</li>
             <li>getSlot</li>
             <li>getTransaction</li>
@@ -167,14 +169,14 @@
 
           <br/>
           <br/>
-          <a href="https://github.com/lamports-dev/alpamayo" >https://github.com/lamports-dev/alpamayo</a>
+          <a href="https://github.com/lamports-dev/alpamayo">https://github.com/lamports-dev/alpamayo</a>
         </section>
         <section>
-          <h3>alpamayo [wip]</h3>
+          <h3>alpamayo</h3>
 
-          <p>Possible improvements for getBlock:</p>
+          <p>Blocks and transactions improvements:</p>
           <ol>
-            <li>HTTP/2 + GET</li>
+            <li>HTTP/GET</li>
             <li>Protobuf encoding</li>
           </ol>
 
@@ -182,10 +184,9 @@
           <ol>
             <li>3ms read data</li>
             <li><s>10ms parse protobuf</s></li>
-            <li><s>120ms encode with options</s></li>
+            <li><s>120ms encode with options (highly depends from the block)</s></li>
             <li><s>10ms serialization</s></li>
-            <li>change protobuf on the fly, 5ms?</li>
-            <li>parse protobuf on client side, 10ms?</li>
+            <li>parse protobuf on client side: +10ms</li>
           </ol>
 
           <br/>
@@ -198,6 +199,14 @@
         <p><a href="https://github.com/lamports-dev/richat" >https://github.com/lamports-dev/richat</a></p>
 
         <p><a href="https://github.com/lamports-dev/alpamayo" >https://github.com/lamports-dev/alpamayo</a></p>
+
+        <p>Future plans:</p>
+        <ol>
+          <li>Cache for getInflationReward/getEpochSchedule/getClusterNodes/etc</li>
+          <li>Snapshot streamer with Yellowstone gRPC / Dragon's Mouth filters</li>
+          <li>Account state for gAI/gPA and simulateTransaction</li>
+          <li>History archival (do we need old-faithful / dexterlab alternative?)</li>
+        </ol>
       </section>
 
     </div>
