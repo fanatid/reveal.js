@@ -140,7 +140,7 @@
             <li>store blocks in protobuf in files</li>
             <li>io-uring (with plans to use direct-io)</li>
             <li>~30% faster response time compared to Agave without load</li>
-            <li>~3ms read time per block</li>
+            <li>~5ms read time per block</li>
             <li>getTransaction with (offset,size)</li>
           </ul>
 
@@ -151,7 +151,7 @@
         <section>
           <h3>alpamayo</h3>
 
-          <ul style="font-size: 14pt;">
+          <ul style="font-size: 20pt;">
             <li>getBlock</li>
             <li>getBlockHeight</li>
             <li>getBlocks</li>
@@ -166,10 +166,6 @@
             <li>getVersion</li>
             <li>isBlockhashValid</li>
           </ul>
-
-          <br/>
-          <br/>
-          <a href="https://github.com/lamports-dev/alpamayo">https://github.com/lamports-dev/alpamayo</a>
         </section>
         <section>
           <h3>alpamayo</h3>
@@ -182,16 +178,17 @@
 
           <p>Performance changes:</p>
           <ol>
-            <li>3ms read data</li>
+            <li>5ms read data</li>
             <li><s>10ms parse protobuf</s></li>
             <li><s>120ms encode with options (highly depends from the block)</s></li>
             <li><s>10ms serialization</s></li>
             <li>parse protobuf on client side: +10ms</li>
           </ol>
+        </section>
+        <section>
+          <h3>alpamayo</h3>
 
-          <br/>
-          <br/>
-          <a href="https://github.com/lamports-dev/alpamayo" >https://github.com/lamports-dev/alpamayo</a>
+          <img src="./alpamayo-bench.png" />
         </section>
       </section>
 
@@ -201,12 +198,12 @@
         <p><a href="https://github.com/lamports-dev/alpamayo" >https://github.com/lamports-dev/alpamayo</a></p>
 
         <p>Future plans:</p>
-        <ol>
+        <ul>
           <li>Cache for getInflationReward/getEpochSchedule/getClusterNodes/etc</li>
           <li>Snapshot streamer with Yellowstone gRPC / Dragon's Mouth filters</li>
           <li>Account state for gAI/gPA and simulateTransaction</li>
           <li>History archival (do we need old-faithful / dexterlab alternative?)</li>
-        </ol>
+        </ul>
       </section>
 
     </div>
