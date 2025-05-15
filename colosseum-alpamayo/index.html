@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+  <title>Agave RPC drop-in replacement</title>
+
+  <link rel="stylesheet" href="dist/reset.css" />
+  <link rel="stylesheet" href="dist/reveal.css" />
+  <link rel="stylesheet" href="dist/theme/moon.css" />
+
+  <!-- Theme used for syntax highlighted code -->
+  <link rel="stylesheet" href="plugin/highlight/monokai.css" />
+
+  <style type="text/css">
+    .reveal h1,
+    .reveal h2,
+    .reveal h3,
+    .reveal h4,
+    .reveal h5,
+    .reveal h6 {
+      text-transform: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section>
+        <h2>Partial Agave RPC stack drop-in replacement</h2>
+        <br/>
+        <br/>
+        <a href="https://github.com/lamports-dev/alpamayo">https://github.com/lamports-dev/alpamayo</a>
+      </section>
+
+      <section>
+        <ul>
+          <li>Subscribe to the Geyser gRPC stream and use RPC in certain cases for missed slots</li>
+          <li>Blocks stored in protobuf in files</li>
+          <li>io-uring (with plans to use direct-io)</li>
+          <li>~30% faster getBlock response time compare to Agave</li>
+          <li>~5ms read time per block</li>
+          <li>getTransaction with (offset,size)</li>
+        </ul>
+      </section>
+      <section>
+        <h4>Block based methods</h4>
+        <ul style="font-size: 20pt;">
+          <li>getBlock</li>
+          <li>getBlockHeight</li>
+          <li>getBlocks</li>
+          <li>getBlocksWithLimit</li>
+          <li>getBlockTime</li>
+          <li>getFirstAvailableBlock</li>
+          <li>getLatestBlockhash</li>
+          <li>getRecentPrioritizationFees (includes `percentile` param <a href="https://github.com/anza-xyz/agave/pull/217">agave#217</a>)</li>
+          <li>getSignaturesForAddress</li>
+          <li>getSignatureStatuses</li>
+          <li>getSlot</li>
+          <li>getTransaction</li>
+          <li>isBlockhashValid</li>
+        </ul>
+      </section>
+      <section>
+        <h4>Smart cache</h4>
+        <ul style="font-size: 20pt;">
+          <li>getClusterNodes</li>
+          <li>getInflationReward</li>
+          <li>getLeaderSchedule</li>
+        </ul>
+      </section>
+      <section>
+        <p>Blocks and transactions improvements:</p>
+        <ol>
+          <li>HTTP/GET</li>
+          <li>Protobuf encoding</li>
+        </ol>
+
+        <p>Performance changes:</p>
+        <ol>
+          <li>5ms read data</li>
+          <li><s>10ms parse protobuf</s></li>
+          <li><s>120ms encode with options (highly depends from the block)</s></li>
+          <li><s>10ms serialization</s></li>
+          <li>parse protobuf on client side: +10ms</li>
+        </ol>
+      </section>
+      <section>
+        <h3>Simple benchmark on low-level hardware</h3>
+
+        <img src="./alpamayo-bench.png" />
+      </section>
+    </div>
+  </div>
+
+  <script src="dist/reveal.js"></script>
+  <script src="plugin/notes/notes.js"></script>
+  <script src="plugin/markdown/markdown.js"></script>
+  <script src="plugin/highlight/highlight.js"></script>
+  <script>
+    // More info about initialization & config:
+    // - https://revealjs.com/initialization/
+    // - https://revealjs.com/config/
+    Reveal.initialize({
+      hash: true,
+      // Learn about plugins: https://revealjs.com/plugins/
+      plugins: [RevealMarkdown, RevealHighlight, RevealNotes],
+    });
+  </script>
+</body>
+
+</html>
