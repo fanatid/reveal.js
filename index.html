@@ -31,181 +31,68 @@
     <div class="slides">
       <section>
         <h2>Partial Agave RPC stack drop-in replacement</h2>
+        <br/>
+        <br/>
+        <a href="https://github.com/lamports-dev/alpamayo">https://github.com/lamports-dev/alpamayo</a>
       </section>
 
       <section>
-        <a href="https://docs.anza.xyz/validator/geyser/">https://docs.anza.xyz/validator/geyser/</a>
-
-        <p style="padding-top: 80pt;">Interface with real-time data:</p>
         <ul>
-          <li>accounts (removed in the future? <a href="https://github.com/anza-xyz/agave/pull/5114">agave#5114</a>)</li>
-          <li>transactions</li>
-          <li>entries</li>
-          <li>block meta</li>
-          <li>slot status (with interslot updates)</li>
+          <li>Subscribe to the Geyser gRPC stream and use RPC in certain cases for missed slots</li>
+          <li>Blocks stored in protobuf in files</li>
+          <li>io-uring (with plans to use direct-io)</li>
+          <li>~30% faster getBlock response time compare to Agave</li>
+          <li>~5ms read time per block</li>
+          <li>getTransaction with (offset,size)</li>
         </ul>
       </section>
-
       <section>
-        <h3>Existed plugins</h3>
-        <ul>
-          <li>
-            <a href="https://github.com/solana-labs/solana-accountsdb-plugin-postgres">PostgreSQL by Solana Team</a>
-          </li>
-          <li>
-            <a href="https://github.com/holaplex/indexer-geyser-plugin">RabbitMQ by Holaplex</a>
-          </li>
-          <li>
-            <a href="https://github.com/Blockdaemon/solana-accountsdb-plugin-kafka">Kafka by Blockdaemon</a>
-          </li>
-          <li>
-            <a href="https://github.com/lijunwangs/solana-accountsdb-plugin-bigtable">BigTable by Lijun Wang</a>
-          </li>
-          <li>
-            <a href="https://github.com/rpcpool/solana-accountsdb-sqs">SQS by Triton One</a>
-          </li>
-          <li>
-            <a href="https://github.com/rpcpool/yellowstone-grpc">Yellowstone gRPC / Dragon's Mouth by Triton One</a>
-          </li>
-          <li>and many more...</li>
+        <h4>Block based methods</h4>
+        <ul style="font-size: 20pt;">
+          <li>getBlock</li>
+          <li>getBlockHeight</li>
+          <li>getBlocks</li>
+          <li>getBlocksWithLimit</li>
+          <li>getBlockTime</li>
+          <li>getFirstAvailableBlock</li>
+          <li>getLatestBlockhash</li>
+          <li>getRecentPrioritizationFees (includes `percentile` param <a href="https://github.com/anza-xyz/agave/pull/217">agave#217</a>)</li>
+          <li>getSignaturesForAddress</li>
+          <li>getSignatureStatuses</li>
+          <li>getSlot</li>
+          <li>getTransaction</li>
+          <li>isBlockhashValid</li>
         </ul>
       </section>
-
       <section>
-        <section>
-          <h3>Yellowstone gRPC / Dragon's Mouth by Triton One</h3>
-          <ul>
-            We need to make a build for every Agave version
-            <ol>
-              <li>Minor version change Rust version</li>
-              <li>Minor version introduce interface changes</li>
-              <li>Patch versions can contains backported breaking-changes (TransactionError case, <a href="https://github.com/solana-labs/solana/pull/33351">solana#33351</a>)
-              </li>
-            </ol>
-          </ul>
-        </section>
-        <section>
-          <h3>Yellowstone gRPC / Dragon's Mouth by Triton One</h3>
-          <ul>
-            Hard to test and debug
-            <ol>
-              <li>Testing and debugging only possible on the server with Agave node</li>
-              <li>If plugin panic we need to restart the node</li>
-              <li>We need to spin-up Agave node, but problem with server price / availability</li>
-              <li>Hard to measure memory and CPU consumption</li>
-              <li>Overloaded with filters and commitment levels</li>
-            </ol>
-          </ul>
-        </section>
-      </section>
-
-      <section>
-        <section>
-          <h3>richat</h3>
-
-          <ul>
-            <li>Lightweight plugin with processed commitment only and filters by message type</li>
-            <li>In addition to gRPC, QUIC supports for streaming between continents</li>
-          </ul>
-
-          <img src="./richat-plugin.png" height="200" />
-
-          <br/>
-          <a href="https://github.com/lamports-dev/richat">https://github.com/lamports-dev/richat</a>
-        </section>
-        <section>
-          <h3>richat</h3>
-
-          <ul>
-            <li>Allow full stream to be downstreamed</li>
-            <li>Server with filters (fully compatiable with Yellowstone gRPC / Dragon's Mouth)</li>
-            <li>Almost fully compatible implementation of Solana Pubsub (except for voteSubscribe, but with transactionSubscribe)</li>
-            <li>Crates that allow building consumers with filters</li>
-            <li>5-10ms delay for full stream in 70% cases compare to Dragon's Mouth</li>
-            <li>Possible additions: performant implementation for Jupiter?</li>
-          </ul>
-
-          <br/>
-          <br/>
-          <a href="https://github.com/lamports-dev/richat">https://github.com/lamports-dev/richat</a>
-        </section>
-      </section>
-
-      <section>
-        <section>
-          <h3>alpamayo</h3>
-
-          <ul>
-            <li>subscribe to the Geyser gRPC stream and use RPC in certain cases for missed slots</li>
-            <li>store blocks in protobuf in files</li>
-            <li>io-uring (with plans to use direct-io)</li>
-            <li>~30% faster response time compared to Agave without load</li>
-            <li>~5ms read time per block</li>
-            <li>getTransaction with (offset,size)</li>
-          </ul>
-
-          <br/>
-          <br/>
-          <a href="https://github.com/lamports-dev/alpamayo">https://github.com/lamports-dev/alpamayo</a>
-        </section>
-        <section>
-          <h3>alpamayo</h3>
-
-          <ul style="font-size: 20pt;">
-            <li>getBlock</li>
-            <li>getBlockHeight</li>
-            <li>getBlocks</li>
-            <li>getBlocksWithLimit</li>
-            <li>getBlockTime</li>
-            <li>getLatestBlockhash</li>
-            <li>getRecentPrioritizationFees (includes `percentile` argument <a href="https://github.com/anza-xyz/agave/pull/217">agave#217</a>)</li>
-            <li>getSignaturesForAddress</li>
-            <li>getSignatureStatuses</li>
-            <li>getSlot</li>
-            <li>getTransaction</li>
-            <li>getVersion</li>
-            <li>isBlockhashValid</li>
-          </ul>
-        </section>
-        <section>
-          <h3>alpamayo</h3>
-
-          <p>Blocks and transactions improvements:</p>
-          <ol>
-            <li>HTTP/GET</li>
-            <li>Protobuf encoding</li>
-          </ol>
-
-          <p>Performance changes:</p>
-          <ol>
-            <li>5ms read data</li>
-            <li><s>10ms parse protobuf</s></li>
-            <li><s>120ms encode with options (highly depends from the block)</s></li>
-            <li><s>10ms serialization</s></li>
-            <li>parse protobuf on client side: +10ms</li>
-          </ol>
-        </section>
-        <section>
-          <h3>alpamayo</h3>
-
-          <img src="./alpamayo-bench.png" />
-        </section>
-      </section>
-
-      <section>
-        <p><a href="https://github.com/lamports-dev/richat" >https://github.com/lamports-dev/richat</a></p>
-
-        <p><a href="https://github.com/lamports-dev/alpamayo" >https://github.com/lamports-dev/alpamayo</a></p>
-
-        <p>Future plans:</p>
-        <ul>
-          <li>Cache for getInflationReward/getEpochSchedule/getClusterNodes/etc</li>
-          <li>Snapshot streamer with Yellowstone gRPC / Dragon's Mouth filters</li>
-          <li>Account state for gAI/gPA and simulateTransaction</li>
-          <li>History archival (do we need old-faithful / dexterlab alternative?)</li>
+        <h4>Smart cache</h4>
+        <ul style="font-size: 20pt;">
+          <li>getClusterNodes</li>
+          <li>getInflationReward</li>
+          <li>getLeaderSchedule</li>
         </ul>
       </section>
+      <section>
+        <p>Blocks and transactions improvements:</p>
+        <ol>
+          <li>HTTP/GET</li>
+          <li>Protobuf encoding</li>
+        </ol>
 
+        <p>Performance changes:</p>
+        <ol>
+          <li>5ms read data</li>
+          <li><s>10ms parse protobuf</s></li>
+          <li><s>120ms encode with options (highly depends from the block)</s></li>
+          <li><s>10ms serialization</s></li>
+          <li>parse protobuf on client side: +10ms</li>
+        </ol>
+      </section>
+      <section>
+        <h3>Simple benchmark on low-level hardware</h3>
+
+        <img src="./alpamayo-bench.png" />
+      </section>
     </div>
   </div>
 
